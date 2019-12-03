@@ -9,8 +9,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ListView;
 import javafx.stage.DirectoryChooser;
 import models.FXGame;
+import textgame.game.Game;
 import views.BigButton;
 import views.BigVBox;
+import views.GameplayInfoPane;
 import views.SideMenuVBox;
 
 import java.io.File;
@@ -27,6 +29,11 @@ public class LevelSelectPane extends GamePane {
     private ListView<String> levelsListView = new ListView<>(LevelManager.getInstance().getLevelNames());
     private BigVBox centerContainer = new BigVBox();
     private Canvas levelPreview = new Canvas();
+
+
+    //helper variable
+    private FXGame selectedGame;
+
 
     public LevelSelectPane() {
         connectComponents();
@@ -104,11 +111,21 @@ public class LevelSelectPane extends GamePane {
         // TODO wip
         if (generateRandom){
             /**Random Map Generated**/
+            selectedGame = new FXGame();
+
+            var pane = SceneManager.getInstance().getPane(GameplayPane.class);
+            ((GameplayPane) pane).startGame(selectedGame);
             SceneManager.getInstance().showPane(GameplayPane.class);
         }
         else
         {
+            /** Selected Map from directory **/
+            if (selectedGame == null )
+                selectedGame = new FXGame();
 
+            var pane = SceneManager.getInstance().getPane(GameplayPane.class);
+            ((GameplayPane) pane).startGame(selectedGame);
+            SceneManager.getInstance().showPane(GameplayPane.class);
         }
     }
 
@@ -128,6 +145,7 @@ public class LevelSelectPane extends GamePane {
             Deserializer ds = new Deserializer( path );
             FXGame game = ds.parseFXGame();
             game.renderMap(levelPreview);
+            selectedGame = game;
         }catch (FileNotFoundException e){ e.printStackTrace();}
     }
 
