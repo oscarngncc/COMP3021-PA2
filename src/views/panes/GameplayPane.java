@@ -7,16 +7,21 @@ import io.Deserializer;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import models.FXGame;
+import models.PipeQueue;
 import org.jetbrains.annotations.NotNull;
 import views.BigButton;
 import views.BigVBox;
@@ -55,7 +60,15 @@ public class GameplayPane extends GamePane {
     @Override
     void connectComponents() {
         // TODO
+        //topBar.getChildren().add(infoPane);
+        topBar.setAlignment(Pos.CENTER);
+        topBar.getChildren().add(gameplayCanvas);
 
+        bottomBar.getChildren().add(queueCanvas);
+        bottomBar.getChildren().add(quitToMenuButton);
+
+        this.setCenter(topBar);
+        this.setBottom(bottomBar);
     }
 
     /**
@@ -64,6 +77,7 @@ public class GameplayPane extends GamePane {
     @Override
     void styleComponents() {
         // TODO
+        bottomBar.setStyle("-fx-background-color: #808080;");
     }
 
     /**
@@ -71,7 +85,10 @@ public class GameplayPane extends GamePane {
      */
     @Override
     void setCallbacks() {
-        // TODO
+        // TODO wip
+        quitToMenuButton.setOnAction(event -> {
+            doQuitToMenuAction();
+        });
     }
 
 
@@ -101,7 +118,18 @@ public class GameplayPane extends GamePane {
      * Creates a popup which tells the player they have completed the map.
      */
     private void createWinPopup() {
-        // TODO
+        // TODO wip
+        ButtonType continueGame = new ButtonType("continue", ButtonBar.ButtonData.YES);
+        ButtonType returnMenu = new ButtonType("return", ButtonBar.ButtonData.NO);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "You Win", continueGame, returnMenu);
+        alert.setHeaderText("You Win!");
+        alert.setContentText("Want to continue or return?");
+        alert.showAndWait();
+
+        if ( alert.getResult().equals(continueGame)){
+            /**Continue Game**/
+        } else doQuitToMenu();
+
     }
 
 
@@ -113,40 +141,66 @@ public class GameplayPane extends GamePane {
         // TODO
     }
 
+
     /**
      * Creates a popup which tells the player they have lost the map.
      */
     private void createLosePopup() {
-        // TODO
+        // TODO --wip click
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText("You Lose!");
+        alert.setContentText("Try again later!");
+        alert.show();
     }
+
 
     /**
      * Creates a popup which prompts the player whether they want to quit.
      */
     private void doQuitToMenuAction() {
         // TODO
+        ButtonType giveUp = new ButtonType("Yes", ButtonBar.ButtonData.NO);
+        ButtonType stillPlay = new ButtonType("No", ButtonBar.ButtonData.YES);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Wanna Give Up?", stillPlay, giveUp);
+        alert.setHeaderText("do you want to quit?");
+        alert.setContentText("you will lose your current progress!!");
+        alert.showAndWait();
+
+        if ( alert.getResult().equals(giveUp)){
+            doQuitToMenu();
+        } else return;
     }
+
+
 
     /**
      * Go back to the Level Select scene.
      */
     private void doQuitToMenu() {
         // TODO
+        SceneManager.getInstance().showPane(LevelSelectPane.class);
     }
 
+
+
     /**
-     * Starts a new game with the given name.
-     *
+     * Starts a new game with the given game.
      * @param game New game to start.
      */
     void startGame(@NotNull FXGame game) {
         // TODO
+        this.game = game;
+        game.renderMap(gameplayCanvas);
+        game.renderQueue(queueCanvas);
     }
+
+
 
     /**
      * Cleans up the currently bound game.
      */
     private void endGame() {
         // TODO
+
     }
 }
