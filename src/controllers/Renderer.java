@@ -96,10 +96,19 @@ public class Renderer {
         final int Row = map.length;
         final int Col = map[0].length;
 
+        /*
+        System.out.println("The loading is: ");
+        for ( int i = 0; i < Row; i++ ) {
+            for (int j = 0; j < Col; j++) {
+                System.out.print(map[i][j].toSerializedRep());
+            }
+            System.out.println();
+        }*/
 
-        canvas.setWidth(Row * TILE_SIZE);
-        canvas.setHeight(Col * TILE_SIZE);
+        canvas.setHeight(Row * TILE_SIZE);
+        canvas.setWidth(Col * TILE_SIZE);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+
 
         for ( int i = 0; i < Row; i++ ){
             for ( int j = 0; j < Col; j++ ){
@@ -107,14 +116,16 @@ public class Renderer {
 
                 if (map[i][j] instanceof TerminationCell){
                     TerminationCell tCell = (TerminationCell) map[i][j];
-                    drawRotatedImage(gc, image, tCell.getImageRep().rotation, TILE_SIZE * i, TILE_SIZE * j  );
+                    drawRotatedImage(gc, image, tCell.getImageRep().rotation, TILE_SIZE * j, TILE_SIZE * i  );
                 }
                 else {
-                    gc.drawImage( image, TILE_SIZE * i, TILE_SIZE * j);
+                    gc.drawImage( image, TILE_SIZE * j, TILE_SIZE * i);
                 }
 
             }
         }
+
+
     }
 
 

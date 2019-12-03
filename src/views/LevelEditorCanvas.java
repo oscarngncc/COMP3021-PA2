@@ -86,8 +86,8 @@ public class LevelEditorCanvas extends Canvas {
                 else cells[i][j] = new FillableCell(new Coordinate(i, j));
             }
         }
-
         gameProp = new GameProperties(rows, cols, cells, delay);
+
         Renderer.renderMap(this, cells );
     }
 
@@ -283,14 +283,6 @@ public class LevelEditorCanvas extends Canvas {
             /*** UI Update **/
             sourceCell = null;
             sinkCell = null;
-
-            for ( int i = 0; i < getNumOfRows(); i++ ) {
-                for (int j = 0; j < getNumOfCols(); j++) {
-                    System.out.print(gameProp.cells[i][j].toSerializedRep());
-                }
-                System.out.println();
-            }
-
 
             for ( int i = 0; i < getNumOfRows(); i++ ){
                 for ( int j = 0; j < getNumOfCols(); j++ ){
