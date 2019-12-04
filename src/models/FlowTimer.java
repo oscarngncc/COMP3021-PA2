@@ -1,7 +1,10 @@
 package models;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -40,6 +43,10 @@ public class FlowTimer {
 
 
     private int ticksElapsed;
+
+
+    //helper time
+    //public IntegerProperty time = new SimpleIntegerProperty();
 
 
     /**
@@ -95,13 +102,21 @@ public class FlowTimer {
      */
     FlowTimer(int initialValue) {
         // TODO wip -- FlowCallBack Or TickCallBack?
+        ticksElapsed = 0;
+        //time.setValue(ticksElapsed);
+
+
         setDefaultDelay(initialValue);
-        this.onFlowCallbacks.add(new Runnable() {
+        this.onTickCallbacks.add(new Runnable() {
             @Override
             public void run() {
-                currentValue.setValue(currentValue.intValue() - 1);
+                ticksElapsed++;
+                //currentValue.set(currentValue.intValue() + 1);
+                System.out.println("Hello! Right now the time is " + ticksElapsed );
             }
         });
+
+
     }
 
 
@@ -139,10 +154,28 @@ public class FlowTimer {
      */
     void start() {
         // TODO wip -- water should flow an additional tile
+
+
+        //Last Update
+        this.onFlowCallbacks.add( new Runnable() {
+            @Override
+            public void run() {
+                currentValue.set(currentValue.intValue() + 1);
+            }
+        });
+
         flowTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 /** missing something */
+                for(Runnable r: onTickCallbacks ){
+                    r.run();
+                }
+                if (ticksElapsed > defaultDelay && ticksElapsed % defaultFlowDuration == 0 ) {
+                    for (Runnable r : onFlowCallbacks) {
+                        r.run();
+                    }
+                }
             }
         }, 1000, 1000);
     }

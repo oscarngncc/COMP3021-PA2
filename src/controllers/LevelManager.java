@@ -64,6 +64,7 @@ public class LevelManager {
     public void setMapDirectory(@NotNull Path mapDirectory) {
         // TODO wip - load map directory?
         this.mapDirectory = mapDirectory;
+        curLevelNameProperty.setValue("Generated");
         loadLevelNamesFromDisk();
     }
 
@@ -89,6 +90,8 @@ public class LevelManager {
             /**Alternate ways to load file
              * Credit: https://stackoverflow.com/questions/1844688/how-to-read-all-files-in-a-folder-from-java**/
             if ( mapDirectory.toFile().exists() ) {
+                levelNames.clear();
+
                 for (final File fileEntry : mapDirectory.toFile().listFiles()) {
                     if (!fileEntry.isDirectory()) {
                         /** Parser for finding .map**/
@@ -99,11 +102,11 @@ public class LevelManager {
                                 /**Action here**/
                                 int end2 = fileEntry.toString().lastIndexOf('\\');
                                 levelNames.add(fileEntry.toString().substring(end2+1) );
-                                System.out.println(levelNames);
                             }
                         }
                     }
                 }
+                System.out.println(levelNames);
                 java.util.Collections.sort(levelNames);
             }
         }
@@ -163,17 +166,20 @@ public class LevelManager {
     @Nullable
     public String getAndSetNextLevel() {
         // TODO wip
-        if ( getCurrentLevelProperty().getValue().isEmpty() || getCurrentLevelProperty().getValue() == null )
+        if ( getCurrentLevelProperty().getValue().isEmpty() || getCurrentLevelProperty().getValue() == null ) {
+            this.curLevelNameProperty.setValue("Generated");
             return null;
+        }
 
         String levelName = getCurrentLevelProperty().getValue();
-        if ( levelNames.indexOf(levelName) == -1 || levelName.indexOf(levelName) == levelNames.size() -1 )
-            return null;
 
-        String nextLevelName = levelNames.get(levelNames.indexOf(levelName) + 1);
-        this.curLevelNameProperty.setValue(nextLevelName);
-        System.out.println("Success in get and set next level, with " + nextLevelName);
-        return nextLevelName;
+        if ( levelNames.indexOf(levelName) == -1 || levelNames.indexOf(levelName) == levelNames.size() -1 ) {
+            this.curLevelNameProperty.setValue("Generated");
+            return null;
+        }
+
+        this.curLevelNameProperty.setValue( levelNames.get(levelNames.indexOf(levelName) + 1)  );
+        return levelNames.get(levelNames.indexOf(levelName) + 1);
     }
 
 

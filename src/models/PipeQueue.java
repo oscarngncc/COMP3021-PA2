@@ -118,6 +118,7 @@ public class PipeQueue {
      */
     public void render(@NotNull Canvas canvas) {
         // TODO
+        Renderer.renderQueue(canvas, pipeQueue);
     }
 
 

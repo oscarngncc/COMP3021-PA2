@@ -1,9 +1,13 @@
 package views;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Label;
+import javafx.util.StringConverter;
+import javafx.util.converter.NumberStringConverter;
 
 import java.time.Duration;
 
@@ -19,8 +23,14 @@ public class GameplayInfoPane extends BigVBox {
     private final Label numUndoLabel = new Label();
 
     public GameplayInfoPane(StringProperty levelNameProperty, IntegerProperty timerProperty, IntegerProperty numMovesProperty, IntegerProperty numUndoProperty) {
-        // TODO
+        // TODO -- wip
+        bindTo(levelNameProperty, timerProperty, numMovesProperty, numUndoProperty);
+        this.getChildren().add(levelNameLabel);
+        this.getChildren().add(timerLabel);
+        this.getChildren().add(numMovesLabel);
+        this.getChildren().add(numUndoLabel);
     }
+
 
     /**
      * @param s Seconds duration
@@ -37,6 +47,7 @@ public class GameplayInfoPane extends BigVBox {
 //        return String.format("%02d:%02d:%02d", s / 3600, (s % 3600) / 60, (s % 60));
     }
 
+
     /**
      * Binds all properties to their respective UI elements.
      *
@@ -46,6 +57,32 @@ public class GameplayInfoPane extends BigVBox {
      * @param numUndoProperty Number of Undoes Property
      */
     private void bindTo(StringProperty levelNameProperty, IntegerProperty timerProperty, IntegerProperty numMovesProperty, IntegerProperty numUndoProperty) {
-        // TODO
+        // TODO wip -- time
+        if ( levelNameProperty.getValue() == null || levelNameProperty.getValue().isEmpty() )
+            levelNameProperty.setValue("Generated");
+        levelNameLabel.textProperty().bind(Bindings.concat("Level: ").concat(levelNameProperty));
+
+
+        StringProperty time = new SimpleStringProperty();
+        Bindings.bindBidirectional(timerLabel.textProperty(), timerProperty, new StringConverter<Number>() {
+            @Override
+            public String toString(Number number) {
+                return "Time: " + format(number.intValue());
+            }
+
+            @Override
+            public Number fromString(String s) {
+                return 0;
+            }
+        });
+
+
+        StringProperty intToS = new SimpleStringProperty();
+        intToS.bindBidirectional(numMovesProperty, new NumberStringConverter());
+        numMovesLabel.textProperty().bind( Bindings.concat("Moves: ").concat(intToS) );
+
+        StringProperty inToS2 = new SimpleStringProperty();
+        inToS2.bindBidirectional(numUndoProperty, new NumberStringConverter());
+        numUndoLabel.textProperty().bind( Bindings.concat("Undo Count:").concat(inToS2));
     }
 }

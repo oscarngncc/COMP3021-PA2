@@ -80,7 +80,6 @@ public class FXGame {
 
 
 
-
     /**
      * Constructs an instance with given number of rows and columns.
      *
@@ -88,8 +87,10 @@ public class FXGame {
      * @param cols Number of columns (excluding side walls)
      */
     private FXGame(int rows, int cols) {
-        // TODO
-        this( rows, cols, 0, null, null);
+        // TODO --wip
+        map = new Map(rows +2, cols + 2);
+        pipeQueue = new PipeQueue();
+        flowTimer = new FlowTimer();
     }
 
 
@@ -104,7 +105,7 @@ public class FXGame {
      * @param pipes Initial pipes, if provided.
      */
     public FXGame(int rows, int cols, int delay, @NotNull Cell[][] cells, @Nullable List<Pipe> pipes) {
-        // TODO
+        // TODO wip
         map = new Map(rows, cols, cells );
         pipeQueue = new PipeQueue(pipes);
         flowTimer = new FlowTimer(delay);
@@ -120,6 +121,7 @@ public class FXGame {
     public void addOnFlowHandler(@NotNull Runnable handler) {
         flowTimer.registerFlowCallback(handler);
     }
+
 
     /**
      * Adds a handler to be run when a tick elapses.
@@ -144,20 +146,32 @@ public class FXGame {
         flowTimer.stop();
     }
 
+
     /**
      * @param row Row index to place pipe
      * @param col Column index to place pipe
      * @see Game#placePipe(int, char)
      */
     public void placePipe(int row, int col) {
-        // TODO
+        // TODO -- instead of delay, what to perform?
+        Pipe p = pipeQueue.peek();
+
+        var coord = new Coordinate(row, col );
+        var result = map.tryPlacePipe(coord, p);
+        if ( result ){
+            pipeQueue.consume();
+            /** Some delay? **/
+            cellStack.push( new FillableCell(coord, p));
+            numOfSteps.setValue(numOfSteps.intValue()+1);
+        }
     }
+
 
     /**
      * @see Game#skipPipe()
      */
     public void skipPipe() {
-        // TODO
+        // TODO wip
         pipeQueue.consume();
         numOfSteps.setValue(numOfSteps.intValue()+1);
     }
@@ -166,7 +180,19 @@ public class FXGame {
 
     /**@see Game#undoStep()*/
     public void undoStep() {
-        // TODO
+        // TODO -- is it correct?
+        var undoCell = cellStack.pop();
+        if ( undoCell != null ){
+            if ( undoCell.getPipe().map(Pipe::getFilled).orElse(false)){
+                cellStack.push(undoCell);
+                return;
+            }
+            pipeQueue.undo(undoCell.getPipe().orElseThrow());
+            map.undo(undoCell.coord);
+
+            numOfSteps.setValue(numOfSteps.intValue()+1);
+        }
+        else return;
     }
 
 
@@ -182,7 +208,6 @@ public class FXGame {
 
     /**
      * Renders the queue onto a {@link Canvas}.
-     *
      * @param canvas {@link Canvas} to render to.
      */
     public void renderQueue(@NotNull Canvas canvas) {
@@ -195,7 +220,16 @@ public class FXGame {
      * @see Game#updateState()
      */
     public void updateState() {
-        // TODO
+        // TODO wip
+        if ( flowTimer.distance() == 0 ){
+
+            map.fillBeginTile();
+            map.fillTiles(flowTimer.distance());
+        } else if ( flowTimer.distance() > 0 ){
+            map.fillTiles(flowTimer.distance());
+        }
+
+        System.out.println(flowTimer.distance());
     }
 
 
@@ -215,7 +249,9 @@ public class FXGame {
      */
     public boolean hasLost() {
         // TODO
-        return false;
+        if ( flowTimer.distance() <= 0 )
+            return false;
+        else return map.hasLost();
     }
 
 

@@ -9,6 +9,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ListView;
 import javafx.stage.DirectoryChooser;
 import models.FXGame;
+import org.jetbrains.annotations.Nullable;
 import textgame.game.Game;
 import views.BigButton;
 import views.BigVBox;
@@ -32,6 +33,7 @@ public class LevelSelectPane extends GamePane {
 
 
     //helper variable
+    @Nullable
     private FXGame selectedGame;
 
 
@@ -66,6 +68,7 @@ public class LevelSelectPane extends GamePane {
     @Override
     void styleComponents() {
         // TODO --wip
+        playButton.setDisable(true);
     }
 
     /**
@@ -113,15 +116,18 @@ public class LevelSelectPane extends GamePane {
             /**Random Map Generated**/
             selectedGame = new FXGame();
 
+            System.out.println("Setup a new game!");
+
             var pane = SceneManager.getInstance().getPane(GameplayPane.class);
             ((GameplayPane) pane).startGame(selectedGame);
             SceneManager.getInstance().showPane(GameplayPane.class);
+            selectedGame = null;
         }
         else
         {
             /** Selected Map from directory **/
             if (selectedGame == null )
-                selectedGame = new FXGame();
+                return;
 
             var pane = SceneManager.getInstance().getPane(GameplayPane.class);
             ((GameplayPane) pane).startGame(selectedGame);
@@ -145,7 +151,11 @@ public class LevelSelectPane extends GamePane {
             Deserializer ds = new Deserializer( path );
             FXGame game = ds.parseFXGame();
             game.renderMap(levelPreview);
+
+            LevelManager.getInstance().setLevel(newValue);
             selectedGame = game;
+            playButton.setDisable(false);
+
         }catch (FileNotFoundException e){ e.printStackTrace();}
     }
 

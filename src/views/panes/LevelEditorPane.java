@@ -2,6 +2,8 @@ package views.panes;
 
 import controllers.SceneManager;
 import io.Deserializer;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -50,6 +52,9 @@ public class LevelEditorPane extends GamePane {
     private Button saveButton = new BigButton("Save As");
 
     private VBox centerContainer = new BigVBox();
+
+    private LevelEditorCanvas.CellSelection selectCell;
+
 
     public LevelEditorPane() {
         connectComponents();
@@ -126,6 +131,18 @@ public class LevelEditorPane extends GamePane {
         saveButton.setOnAction( event -> {
             /** Saving **/
             levelEditor.saveToFile();
+        });
+
+        selectedCell.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<LevelEditorCanvas.CellSelection>() {
+            @Override
+            public void changed(ObservableValue<? extends LevelEditorCanvas.CellSelection> observableValue, LevelEditorCanvas.CellSelection cellSelection, LevelEditorCanvas.CellSelection t1) {
+                selectCell = t1;
+            }
+        });
+
+        levelEditor.setOnMouseClicked(mouseEvent -> {
+            if (selectCell != null )
+                levelEditor.setTile( selectCell ,mouseEvent.getX(), mouseEvent.getY() );
         });
     }
 }

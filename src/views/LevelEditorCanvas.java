@@ -117,11 +117,10 @@ public class LevelEditorCanvas extends Canvas {
     }
 
     /** Helper Function for determining whether termination cell is sink or not (false will be source) **/
-    private boolean checkIsSink(Cell cell ) throws IllegalArgumentException {
+    private boolean checkIsSink(Cell cell) throws IllegalArgumentException {
         if ( cell instanceof TerminationCell)
             throw new IllegalArgumentException("Not a Termination CEll!!!");
 
-        System.out.println("JOJO");
 
         if ( cell.coord.row == 0 || cell.coord.row == gameProp.rows -1
         ||   cell.coord.col == 0 || cell.coord.col == gameProp.cols -1)
@@ -148,19 +147,48 @@ public class LevelEditorCanvas extends Canvas {
         if ( x < 0 || y  < 0 )
             return;
 
+        System.out.println( "setTile: x is " + x + " and y is " + y);
+
         int xPos = (int) x /TILE_SIZE;
         int yPos = (int) y /TILE_SIZE;
 
         if ( sel == CellSelection.CELL ){
             checkRemoveTerminationCell(xPos, yPos);
-            gameProp.cells[xPos][yPos] = new FillableCell(new Coordinate(xPos, yPos));
+            gameProp.cells[yPos][xPos] = new FillableCell(new Coordinate(xPos, yPos));
+            renderCanvas();
         }
         else if ( sel == CellSelection.TERMINATION_CELL ){
-            //gameProp.cells[xPos][yPos] = new TerminationCell(new Coordinate(xPos, yPos));
+            /**Check is it a sink **/
+            if ( yPos == 0 || yPos == gameProp.rows -1  ||   xPos == 0 || xPos == gameProp.cols -1 ){
+
+                if ((xPos == 0 || xPos == gameProp.cols -1) && (yPos == 0 || yPos == gameProp.rows -1 ))
+                    return;
+
+                Direction d = Direction.UP;
+                if (xPos == gameProp.cols -1 )
+                    d = Direction.LEFT;
+                else if ( yPos == 0 )
+                    d = Direction.DOWN;
+                else if ( xPos == 0 )
+                    d = Direction.RIGHT;
+                else if (yPos == gameProp.rows -1 )
+                    d = Direction.UP;
+
+                gameProp.cells[yPos][xPos] = new TerminationCell( new Coordinate(xPos, yPos), d, TerminationCell.Type.SINK );
+                sinkCell = (TerminationCell) gameProp.cells[yPos][xPos];
+                renderCanvas();
+
+            }
+            else { //is source
+                gameProp.cells[yPos][xPos] = new TerminationCell( new Coordinate(xPos, yPos), Direction.UP, TerminationCell.Type.SOURCE );
+                sourceCell = (TerminationCell) gameProp.cells[yPos][xPos];
+                renderCanvas();
+            }
         }
         else if ( sel == CellSelection.WALL ){
             checkRemoveTerminationCell(xPos, yPos);
-            gameProp.cells[xPos][yPos] = new Wall(new Coordinate(xPos, yPos));
+            gameProp.cells[yPos][xPos] = new Wall(new Coordinate(xPos, yPos));
+            renderCanvas();
         }
 
     }
@@ -176,7 +204,6 @@ public class LevelEditorCanvas extends Canvas {
      */
     private void setTileByMapCoord(@NotNull Cell cell) {
         // TODO - wip ( what about replacement?)
-
 
         if ( cell instanceof TerminationCell ){
             boolean isSink = false;

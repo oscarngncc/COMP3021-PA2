@@ -6,9 +6,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.transform.Rotate;
 import models.map.cells.Cell;
+import models.map.cells.FillableCell;
 import models.map.cells.TerminationCell;
 import models.pipes.Pipe;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -42,6 +44,8 @@ public class Renderer {
         }
     }
 
+    //Special Variable for getting value
+    private static int originalLength = -1;
 
 
     /**
@@ -118,6 +122,12 @@ public class Renderer {
                     TerminationCell tCell = (TerminationCell) map[i][j];
                     drawRotatedImage(gc, image, tCell.getImageRep().rotation, TILE_SIZE * j, TILE_SIZE * i  );
                 }
+                else if ( map[i][j] instanceof FillableCell ){
+                    if ( ((FillableCell) map[i][j]).getPipe().isPresent() ){
+                        drawRotatedImage(gc, image, map[i][j].getImageRep().rotation, TILE_SIZE * j, TILE_SIZE * i );
+                    }
+                    else gc.drawImage( image, TILE_SIZE * j, TILE_SIZE * i);
+                }
                 else {
                     gc.drawImage( image, TILE_SIZE * j, TILE_SIZE * i);
                 }
@@ -138,12 +148,22 @@ public class Renderer {
      */
     public static void renderQueue(@NotNull Canvas canvas, @NotNull List<Pipe> pipeQueue) {
         // TODO wip -- positioning?
+        int width = (originalLength > -1 && originalLength < pipeQueue.size() ) ? originalLength: pipeQueue.size();
+
+
         canvas.setHeight(TILE_SIZE);
-        canvas.setWidth(TILE_SIZE * pipeQueue.size() );
+        canvas.setWidth(TILE_SIZE * width );
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        for ( int i = 0; i < pipeQueue.size(); i++ ){
-            gc.drawImage( pipeQueue.get(i).getImageRep().image, TILE_SIZE * i, 0);
+        for ( int i = 0; i < width; i++ ){
+            var ImageRep = pipeQueue.get(i).getImageRep();
+            drawRotatedImage(gc, ImageRep.image, ImageRep.rotation,TILE_SIZE * i, 0 );
+
+            //BAD evil CODE
+            if (originalLength == -1){
+                originalLength = pipeQueue.size();
+            }
+
         }
     }
 }

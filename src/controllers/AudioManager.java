@@ -4,6 +4,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -69,7 +70,7 @@ public class AudioManager {
         // TODO wip -- daemond thread dispose
         if (this.enabled == false ) return;
         try {
-            Media media = new Media(name);
+            Media media = new Media(ResourceLoader.getResource("assets/audio/" + name + ".mp3"));
             MediaPlayer mPlayer = new MediaPlayer(media);
             soundPool.add(mPlayer);
             mPlayer.setOnEndOfMedia(new Runnable() {
