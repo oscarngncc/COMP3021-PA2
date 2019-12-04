@@ -98,8 +98,9 @@ public class GameplayPane extends GamePane {
             doQuitToMenuAction();
         });
         gameplayCanvas.setOnMouseClicked(MouseEvent ->{
-            if (EnableInput)
+            if (EnableInput) {
                 onCanvasClicked(MouseEvent);
+            }
         });
         this.setOnKeyPressed(keyEvent -> {
             if (EnableInput)

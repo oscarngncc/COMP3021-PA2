@@ -69,6 +69,7 @@ public class LevelSelectPane extends GamePane {
     void styleComponents() {
         // TODO --wip
         playButton.setDisable(true);
+        leftContainer.setStyle("-fx-background-color: #B0B0B0;");
     }
 
     /**

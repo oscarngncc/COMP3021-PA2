@@ -171,7 +171,7 @@ public class FlowTimer {
                 for(Runnable r: onTickCallbacks ){
                     r.run();
                 }
-                if (ticksElapsed > defaultDelay && ticksElapsed % defaultFlowDuration == 0 ) {
+                if (ticksElapsed >= defaultDelay && ticksElapsed % defaultFlowDuration == 0 ) {
                     for (Runnable r : onFlowCallbacks) {
                         r.run();
                     }

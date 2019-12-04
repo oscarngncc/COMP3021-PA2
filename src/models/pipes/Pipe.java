@@ -160,8 +160,8 @@ public class Pipe implements MapElement {
             if (! isFilled){
                 if ( this == CROSS )
                     return new Renderer.CellImage(CROSS_UNFILLED, 0);
-                else if (this == HORIZONTAL ) {
-                    int rotation = (this == VERTICAL) ? 0 : 180;
+                else if (this == HORIZONTAL || this == VERTICAL ) {
+                    int rotation = (this == VERTICAL) ? 0 : 90;
                     return new Renderer.CellImage(STRAIGHT_UNFILLED, rotation);
                 }
                 else
@@ -179,8 +179,8 @@ public class Pipe implements MapElement {
             {
                 if ( this == CROSS )
                     return new Renderer.CellImage(CROSS_FILLED, 0);
-                else if (this == HORIZONTAL ) {
-                    int rotation = (this == VERTICAL) ? 0 : 180;
+                else if (this == HORIZONTAL || this == VERTICAL ) {
+                    int rotation = (this == VERTICAL) ? 0 : 90;
                     return new Renderer.CellImage(STRAIGHT_FILLED, rotation);
                 }
                 else
